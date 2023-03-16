@@ -1,3 +1,5 @@
+//GitHub Repo Link: https://github.com/shashankpathak7798/OnlineMic-Task.git////////////////////////////////
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,20 +28,21 @@ class _MainScreenState extends State<MainScreen> {
   VideoPlayerController? _videoPlayerController;
   Future<void>? _initializeVideoPlayerFuture;
 
-
-
   Future<void> compressVideo() async {
     setState(() {
       isUploading = true;
     });
     final FirebaseStorage storage = FirebaseStorage.instance;
 
-    if(_videoPath.isEmpty) {
+    if (_videoPath.isEmpty) {
       return;
     }
     final videoFile = File(_videoPath);
 
-    final info = await VideoCompress.compressVideo(videoFile.path, quality: VideoQuality.DefaultQuality,);
+    final info = await VideoCompress.compressVideo(
+      videoFile.path,
+      quality: VideoQuality.DefaultQuality,
+    );
 
     final compressedResult = info?.file;
 
@@ -53,24 +56,28 @@ class _MainScreenState extends State<MainScreen> {
       'url': url,
       'createdAt': FieldValue.serverTimestamp(),
     }).whenComplete(() {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Success!!'), backgroundColor: Colors.green,),);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Success!!'),
+          backgroundColor: Colors.green,
+        ),
+      );
       setState(() {
         _videoPath = '';
         uploadSuccess = true;
         isUploading = false;
       });
     });
-
   }
-
-
-
 
   // Function to pick video from device storage.
   Future<void> _pickVideo() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.video, allowMultiple: false,);
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.video,
+      allowMultiple: false,
+    );
 
-    if(result != null) {
+    if (result != null) {
       File file = File(result.files.single.path!);
 
       _videoPlayerController = VideoPlayerController.file(file);
@@ -84,8 +91,6 @@ class _MainScreenState extends State<MainScreen> {
         _videoPath = file.path;
       });
       print('VideoPath: $_videoPath');
-
-
     }
   }
 
@@ -94,7 +99,8 @@ class _MainScreenState extends State<MainScreen> {
     final cameras = await availableCameras();
     final camera = cameras.first;
 
-    _cameraController = CameraController(camera, ResolutionPreset.high, enableAudio: true);
+    _cameraController =
+        CameraController(camera, ResolutionPreset.high, enableAudio: true);
 
     await _cameraController?.initialize();
     await _cameraController?.startImageStream((image) {});
@@ -111,16 +117,17 @@ class _MainScreenState extends State<MainScreen> {
 
   // Function to Stop Video Recording
   Future<void> stopRecording() async {
-    if(!_cameraController!.value.isRecordingVideo) {
+    if (!_cameraController!.value.isRecordingVideo) {
       return;
     }
     _cameraController?.pausePreview();
 
     final XFile videoFile = await _cameraController!.stopVideoRecording();
     final tempDir = await getTemporaryDirectory();
-    final outputFile = File('${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
+    final outputFile =
+        File('${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.mp4');
     await videoFile.saveTo(outputFile.path);
-    
+
     _videoPlayerController = VideoPlayerController.file(outputFile);
     _initializeVideoPlayerFuture = _videoPlayerController?.initialize();
     _videoPlayerController?.play();
@@ -129,9 +136,7 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _videoPath = outputFile.path;
     });
-
   }
-
 
   @override
   void initState() {
@@ -139,7 +144,6 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     initializeCamera();
   }
-
 
   @override
   void dispose() {
@@ -152,34 +156,61 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Lost Less Compressor'), actions: [IconButton(onPressed: () => setState(() {
-        _videoPlayerController?.pause();
-        _videoPlayerController = null;
-      }), icon: Icon(Icons.delete))],),
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text('Lost Less Compressor'),
+        actions: [
+          IconButton(
+              onPressed: () => setState(() {
+                    _videoPlayerController?.pause();
+                    _videoPlayerController = null;
+                  }),
+              icon: Icon(Icons.delete))
+        ],
+      ),
+      backgroundColor: Colors.tealAccent.withOpacity(0.8),
       body: Column(
         children: [
-          Row(children: [
-            Row(
-              children: [
-                Radio(value: 0, groupValue: _toUpload, onChanged: (val) => setState(() {
-                  _toUpload = 0;
-                }),),
-                Text('Upload a Video'),
-              ],
-            ),
-            Row(
-              children: [
-                Radio(value: 1, groupValue: _toUpload, onChanged: (val) => setState(() {
-                  _toUpload = 1;
-                }),),
-                Text('Record a Video'),
-              ],
-            ),
-          ],),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Row(
+                children: [
+                  Radio(
+                    value: 0,
+                    groupValue: _toUpload,
+                    onChanged: (val) => setState(() {
+                      _toUpload = 0;
+                    }),
+                  ),
+                  Text('Upload a Video'),
+                ],
+              ),
+              Row(
+                children: [
+                  Radio(
+                    value: 1,
+                    groupValue: _toUpload,
+                    onChanged: (val) => setState(() {
+                      _toUpload = 1;
+                    }),
+                  ),
+                  Text('Record a Video'),
+                ],
+              ),
+            ],
+          ),
+          Divider(
+            thickness: 4,
+            color: Colors.deepPurple.withOpacity(0.5),
+            indent: 10,
+            endIndent: 10,
+          ),
           Stack(
             children: [
               Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.black, width: 2),
@@ -194,37 +225,106 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 width: double.infinity,
                 height: 400,
-                child: _videoPlayerController == null ? Center(child: Text('Please Upload or Record a Video!!'),) : FutureBuilder<void>(
-                  future: _initializeVideoPlayerFuture,
-                  builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      return AspectRatio(
-                        aspectRatio: _videoPlayerController!.value.aspectRatio,
-                        child: VideoPlayer(_videoPlayerController!),
-                      );
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ),
+                child: _videoPlayerController == null
+                    ? Center(
+                        child: Text('Please Upload or Record a Video!!'),
+                      )
+                    : FutureBuilder<void>(
+                        future: _initializeVideoPlayerFuture,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<void> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            return AspectRatio(
+                              aspectRatio:
+                                  _videoPlayerController!.value.aspectRatio,
+                              child: VideoPlayer(_videoPlayerController!),
+                            );
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                        },
+                      ),
               ),
-              if(isUploading) Container(width: double.infinity, height: 400, color: Colors.white24, child: Center(child: Container(width: 100, height: 100, child: CircularProgressIndicator()))),
+              if (isUploading)
+                Container(
+                    width: double.infinity,
+                    height: 400,
+                    color: Colors.white24,
+                    child: Center(
+                        child: Container(
+                            width: 100,
+                            height: 100,
+                            child: CircularProgressIndicator()))),
             ],
           ),
-          if(_toUpload == 0) ElevatedButton(onPressed: _pickVideo, child: Text('Upload Video!,'),),
-          if(_toUpload == 1) Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10,),
-            child: Row(children: [
-              ElevatedButton.icon(onPressed: startRecording, label: Text('Start Recording'), icon: Icon(Icons.play_arrow),),
-              Spacer(),
-              ElevatedButton.icon(onPressed: stopRecording, label: Text('Stop Recording'), icon: Icon(Icons.pause),),
-            ],),
+          Divider(
+            thickness: 3,
+            color: Colors.deepPurple.withOpacity(0.5),
+            indent: 10,
+            endIndent: 10,
           ),
+          if (_toUpload == 0)
+            ElevatedButton(
+              onPressed: _pickVideo,
+              child: Text('Pick Video!,'),
+              style: ButtonStyle(
+                elevation: MaterialStateProperty.all(15),
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.blue.withOpacity(0.8),),
+                side: MaterialStateProperty.all<BorderSide>(BorderSide(width: 0.5, style: BorderStyle.solid,),),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),),
+              ),
+            ),
+          if (_toUpload == 1)
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 10,
+                right: 10,
+              ),
+              child: Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: startRecording,
+                    label: Text('Start Recording'),
+                    icon: Icon(Icons.play_arrow),
+                    style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(15),
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors.blue.withOpacity(0.8),),
+                      side: MaterialStateProperty.all<BorderSide>(BorderSide(width: 0.5, style: BorderStyle.solid,),),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),),
+                    ),
+                  ),
+                  Spacer(),
+                  ElevatedButton.icon(
+                    onPressed: stopRecording,
+                    label: Text('Stop Recording'),
+                    icon: Icon(Icons.pause),
+                    style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(15),
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors.blue.withOpacity(0.8),),
+                      side: MaterialStateProperty.all<BorderSide>(BorderSide(width: 0.5, style: BorderStyle.solid,),),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-            ElevatedButton.icon(onPressed: () => compressVideo(), icon: Icon(Icons.upload), label: Text('Compress&Upload'),),
-          ],),
+              ElevatedButton.icon(
+                onPressed: () => compressVideo(),
+                icon: Icon(Icons.upload),
+                label: Text('Compress&Upload'),
+                style: ButtonStyle(
+                  elevation: MaterialStateProperty.all(15),
+                  backgroundColor: MaterialStateProperty.all<Color>(Colors.blue.withOpacity(0.8),),
+                  side: MaterialStateProperty.all<BorderSide>(BorderSide(width: 0.5, style: BorderStyle.solid,),),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
