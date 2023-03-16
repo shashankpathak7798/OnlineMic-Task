@@ -166,6 +166,7 @@ class _MainScreenState extends State<MainScreen> {
                   }),
               icon: Icon(Icons.delete))
         ],
+        backgroundColor: Colors.blueAccent.withOpacity(0.5),
       ),
       backgroundColor: Colors.tealAccent.withOpacity(0.8),
       body: Column(
