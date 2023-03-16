@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "771169885841",
+    "project_id": "onlinemictask",
+    "storage_bucket": "onlinemictask.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771169885841:android:5317e355deb2d9207aa930",
+        "android_client_info": {
+          "package_name": "com.example.internshala_task"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771169885841-kc8j68knb95uhipl1gtfc62ua1aik7p4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSbwffL7VqK8i4J7T50Y6nPLsDkfubL0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771169885841-kc8j68knb95uhipl1gtfc62ua1aik7p4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771169885841:android:75e7bfd8df1325087aa930",
+        "android_client_info": {
+          "package_name": "com.example.internshala_task_online_mic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771169885841-kc8j68knb95uhipl1gtfc62ua1aik7p4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSbwffL7VqK8i4J7T50Y6nPLsDkfubL0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771169885841-kc8j68knb95uhipl1gtfc62ua1aik7p4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
