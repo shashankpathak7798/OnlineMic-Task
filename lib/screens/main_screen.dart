@@ -23,6 +23,7 @@ class _MainScreenState extends State<MainScreen> {
   int _toUpload = 0;
   bool isUploading = false;
   bool uploadSuccess = false;
+  bool _recordingStarted = false;
 
   CameraController? _cameraController;
   VideoPlayerController? _videoPlayerController;
@@ -103,12 +104,18 @@ class _MainScreenState extends State<MainScreen> {
         CameraController(camera, ResolutionPreset.high, enableAudio: true);
 
     await _cameraController?.initialize();
-    await _cameraController?.startImageStream((image) {});
+    setState(() {});
   }
 
   // Function to Start Video Recording
   Future<void> startRecording() async {
     try {
+      setState(() {
+        _videoPath = '';
+        _videoPlayerController?.pause();
+        _videoPlayerController = null;
+        _recordingStarted = true;
+      });
       await _cameraController?.startVideoRecording();
     } catch (e) {
       print(e);
@@ -121,6 +128,10 @@ class _MainScreenState extends State<MainScreen> {
       return;
     }
     _cameraController?.pausePreview();
+
+    setState(() {
+      _recordingStarted = false;
+    });
 
     final XFile videoFile = await _cameraController!.stopVideoRecording();
     final tempDir = await getTemporaryDirectory();
@@ -152,6 +163,31 @@ class _MainScreenState extends State<MainScreen> {
     _videoPlayerController?.dispose();
     super.dispose();
   }
+
+
+
+  Widget buildPreview() {
+
+    return _recordingStarted == true ? Center(child: Text('Recording Started Please Record the video and click stop recording when done!!'),) : FutureBuilder<void>(
+      future: _initializeVideoPlayerFuture,
+      builder: (BuildContext context,
+          AsyncSnapshot<void> snapshot) {
+        if (snapshot.connectionState ==
+            ConnectionState.done) {
+          return AspectRatio(
+            aspectRatio:
+            _videoPlayerController!.value.aspectRatio,
+            child: VideoPlayer(_videoPlayerController!),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -212,6 +248,7 @@ class _MainScreenState extends State<MainScreen> {
                 margin: EdgeInsets.symmetric(
                   horizontal: 10,
                 ),
+                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.black, width: 2),
@@ -230,22 +267,7 @@ class _MainScreenState extends State<MainScreen> {
                     ? Center(
                         child: Text('Please Upload or Record a Video!!'),
                       )
-                    : FutureBuilder<void>(
-                        future: _initializeVideoPlayerFuture,
-                        builder: (BuildContext context,
-                            AsyncSnapshot<void> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.done) {
-                            return AspectRatio(
-                              aspectRatio:
-                                  _videoPlayerController!.value.aspectRatio,
-                              child: VideoPlayer(_videoPlayerController!),
-                            );
-                          } else {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                        },
-                      ),
+                    : buildPreview(),
               ),
               if (isUploading)
                 Container(
